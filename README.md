@@ -16,10 +16,19 @@
 
 ```
 $ docker exec -ti service_nano /bin/sh -c "./bin/init.sh"
+
+```
+
+3. Проверить что воркеры запущены (если нет, то стартануть):
+
+```
+$ docker exec -ti service_nano /bin/sh -c "supervisorctl status"
+$ docker exec -ti service_nano /bin/sh -c "supervisorctl start queue:*"
 ```
 
 ## Примеры API запросов
 
+Все запросы и обработка сообщений логируются: `tail -f ./storage/logs/laravel.log`
 
 ##### Отправка одного сообщения
 `POST`  http://app.local/api/send-message
