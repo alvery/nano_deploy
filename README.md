@@ -1,5 +1,8 @@
 # Nano service deployment
 
+
+## Настройка deployment
+
 1. Склонировать текущий репозиторий и репозиторий самого сервиса: https://github.com/alvery/nano_service
 2. Скопировать `.env.example -> .env`
 3. Указать базовый домен BASE_DOMAIN и прописать его в /etc/hosts
@@ -14,3 +17,61 @@
 ```
 $ docker exec -ti service_nano /bin/sh -c "./bin/init.sh"
 ```
+
+## Примеры API запросов
+
+
+##### Отправка одного сообщения
+`POST`  http://app.local/api/send-message
+
+```
+curl -X POST \
+  http://app.local/api/send-message \
+  -H 'Accept: application/json' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"type": 1,
+	"message": "Hello kitty",
+	"delay": 0
+}'
+```
+
+
+
+##### Отправка нескольких сообщений
+`POST`  http://app.local/api/send-message-multiple
+
+```
+curl -X POST \
+  http://app.local/api/send-message-multiple \
+  -H 'Accept: application/json' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Content-Type: application/json' \
+  -d '{
+	"data":
+	[
+		{
+			"type": 1,
+			"message": "Hello kitty 1",
+			"delay": 10
+		},
+		{
+			"type": 2,
+			"message": "Hello kitty 2"
+		},
+		{
+			"type": 3,
+			"message": "Hello kitty 3",
+			"delay": 0
+		}
+	]
+
+}'
+```
+
+| Поле | Тип | Описание |
+| ------ | ------ | ------ |
+| type | integer | 1 - Telegram; 2 - Viber; 3 - WhatsApp |
+| message | string | текст сообщения |
+| delay | integer | задержка отправки в секундах; 0 - отправить без задержки; если не указано - будет использована отправка по расписанию |
