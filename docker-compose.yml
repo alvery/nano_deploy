@@ -1,0 +1,53 @@
+version: '2'
+services:
+
+    db_nano:
+        image: postgres:10.4-alpine
+        container_name: db_nano
+        restart: always
+        volumes:
+            - ${DATA_DIR}/postgresql/db_nano:/var/lib/postgresql/data
+            - ${LOG_DIR}/postgresql/db_nano:/var/log/postgresql
+        ports:
+            - ${DB_PORT_NANO}:5432
+        environment:
+            - POSTGRES_DB=${DB_NAME_NANO}
+            - POSTGRES_USER=${DB_USERNAME_NANO}
+            - POSTGRES_PASSWORD=${DB_PASSWORD_NANO}
+
+    service_nano:
+        build: ./docker/php-fpm
+        container_name: service_nano
+        restart: always
+        ports:
+            - 9001:9000
+        volumes:
+            - ${SERVICE_DIR_NANO}:/var/www/backend
+            - ${SERVICE_DIR_NANO}/supervisor:/etc/supervisor.d
+        links:
+            - db_nano
+        environment:
+            - XDEBUG=${XDEBUG}
+
+    nginx:
+        build: ./docker/nginx
+        container_name: nginx
+        restart: always
+        ports:
+            - 80:80
+        links:
+            - service_nano
+        volumes_from:
+            - service_nano
+        volumes:
+            - ${LOG_DIR}/nginx/:/var/log/nginx
+        environment:
+            - API_DOMAIN=${BASE_DOMAIN}
+
+    redis:
+        image: redis:alpine
+        container_name: redis
+        restart: always
+        mem_limit: 128m
+        volumes:
+          - ${DATA_DIR}/redis:/data'
